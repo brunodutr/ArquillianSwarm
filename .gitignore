@@ -29,6 +29,7 @@ Thumbs.db
 .buildpath
 .classpath
 .project
+target/
 
 # Logging
 *.log
