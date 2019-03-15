@@ -1,4 +1,6 @@
-package br.com.bdutra;
+package br.com.bdutra.suite;
+
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -6,42 +8,23 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
-import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.junit.InSequence;
-import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import br.com.bdutra.BaseIT;
+import br.com.bdutra.dao.impl.PessoaDAO;
 import br.com.bdutra.entidade.Pessoa;
 import br.com.bdutra.jms.ServicoProducer;
 import br.com.bdutra.jmx.ServicoJMX;
 
 @RunWith(Arquillian.class)
-//@DefaultDeployment(type = JAR)
-public class InContainerTest {
+public class MessageDrivenBeanTest extends BaseIT {
 
-	private static final Logger LOG = Logger.getLogger(InContainerTest.class);
-
-	@SuppressWarnings("rawtypes")
-	@Deployment
-	public static Archive createDeployment() {
-		// Logger.getRootLogger().setLevel(DEBUG);
-
-		JavaArchive jar = ShrinkWrap.create(JavaArchive.class).addPackages(true, "br.com.bdutra")
-				.addAsResource("project-it.yml", "project-defaults.yml")
-				.addAsResource("META-INF/test-persistence.xml", "META-INF/persistence.xml")
-				.addAsResource("META-INF/beans.xml").addAsResource("META-INF/arquillian.xml")
-				.addAsResource("META-INF/ejb-jar.xml");
-
-		System.out.println(jar.toString(true));
-
-		return jar;
-	}
+	private static final Logger LOG = Logger.getLogger(MessageDrivenBeanTest.class);
 
 	@Inject
 	private PessoaDAO pessoaDAO;
@@ -51,6 +34,16 @@ public class InContainerTest {
 
 	@Test
 	@InSequence(1)
+	public void testInject() {
+
+		super.beforeTest();
+
+		assertNotNull(pessoaDAO);
+		assertNotNull(producer);
+	}
+
+	@Test
+	@InSequence(2)
 	public void testDAO() {
 		Pessoa pessoa = new Pessoa();
 		pessoa.setNome("Bruno");
@@ -63,7 +56,7 @@ public class InContainerTest {
 	}
 
 	@Test
-	@InSequence(2)
+	@InSequence(3)
 	public void enviarMensagensParaFila() throws Exception {
 
 		Pessoa pessoa = new Pessoa();
@@ -89,15 +82,17 @@ public class InContainerTest {
 
 	@Test
 	@RunAsClient
-	@InSequence(3)
+	@InSequence(4)
 	public void esperaFilaSerConsumida() throws Exception {
+
+		LOG.info("Esperando fila ser consumida");
 
 		ServicoJMX.esperarFila("arquillianQueue");
 
 	}
 
 	@Test
-	@InSequence(4)
+	@InSequence(5)
 	public void verificaMDB() {
 
 		LOG.info("Verificando MDB");

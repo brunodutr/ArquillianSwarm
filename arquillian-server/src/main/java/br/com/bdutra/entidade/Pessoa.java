@@ -12,7 +12,7 @@ import javax.persistence.UniqueConstraint;
 
 @Entity
 @Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "nome", "sobrenome" }) })
-public class Pessoa implements Serializable {
+public class Pessoa extends AbstractEntity implements Serializable {
 
 	/**
 	 * 

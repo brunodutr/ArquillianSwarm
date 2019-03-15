@@ -7,7 +7,7 @@ import javax.jms.ObjectMessage;
 
 import org.apache.log4j.Logger;
 
-import br.com.bdutra.PessoaDAO;
+import br.com.bdutra.dao.impl.PessoaDAO;
 import br.com.bdutra.entidade.Pessoa;
 
 public class ServicoListener implements MessageListener {
