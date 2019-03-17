@@ -1,5 +1,6 @@
 language: java
-script: mvn clean test
+install: true
+script: mvn clean install
 
 cache:
   directories:
